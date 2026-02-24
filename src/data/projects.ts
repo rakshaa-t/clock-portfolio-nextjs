@@ -1,0 +1,25 @@
+// ═══ Case Studies (Puzzle Grid Projects) ═══
+// To add a new project: copy an existing object, update the fields, and add slides.
+// The `desc` field can be a string (short) or an array of strings (multi-paragraph case study).
+
+import type { Project } from '@/types'
+
+export const PUZZLE_PROJECTS = [
+  {title:'Tickle',tags:['Mobile','MVP','2025'],thumb:'/projects/pet-tickle.jpg',link:'https://medium.com/@rakshatated98/tickle-app-case-study-6a3e651b5418',images:['/projects/tickle/hero-mockup.jpg','/projects/tickle/11-care-intro.jpg','/projects/tickle/10-onboarding-screens.jpg','/projects/tickle/13-habit-intro.jpg','/projects/tickle/12-home-screens.jpg','/projects/tickle/14-tickle-screens.jpg'],slides:['#A699D4','#9488C8','#B8ADDC','#8278B8','#A699D4','#9488C8']},
+  {title:'Ova App',tags:['Health','0-1','Figma','Rive'],thumb:'/projects/ova-app.jpg',link:'https://medium.com/@rakshatated98/ova-app-case-study-3a652f27fde8',images:['/projects/ova/ova-demo.mp4','/projects/ova/ova-screens.jpg','/projects/ova/ova-pick.jpg','/projects/ova/ova-onboarding.jpg','/projects/ova/ova-features.jpg'],slides:['#6C7EB8','#5C6EA8','#4C5E98','#5C6EA8','#6C7EB8']},
+  {title:'Greex DeFi',tags:['Fintech','Trading','2024'],thumb:'/projects/greex-defi.jpg',link:'https://medium.com/@rakshatated98/greex-case-study-a-defi-trading-platform-195d2bf52575',images:['/projects/greex/greex-trade.jpg','/projects/greex/greex-order.jpg','/projects/greex/greex-kyc.jpg','/projects/greex/greex-strategy.jpg','/projects/greex/greex-parlays.jpg'],slides:['#9DB8D0','#8DA8C0','#7D98B0','#8DA8C0','#9DB8D0']},
+  {title:'IndianOil Dashboard',tags:['Dashboard','Enterprise'],thumb:'/projects/indianoil.jpg',link:'#',comingSoon:true,slides:['#7E8EC8']},
+  {title:'DealDoc',tags:['SaaS','Dashboard','2025'],thumb:'/projects/dealdoc-overview.jpg',link:'#',comingSoon:true,slides:['#8BA8C4']},
+  {title:'ADiagnosis',tags:['Medical','AI'],thumb:'/projects/adiagnosis.jpg',link:'#',comingSoon:true,slides:['#B090C8']},
+  {title:'Vault DeFi',tags:['DeFi','Web3'],thumb:'/projects/vault-defi.jpg',externalLink:'',slides:['#8DA8C0']},
+  {title:'Cycling App',tags:['Mobile','Fitness'],thumb:'/projects/cycling-app.jpg',externalLink:'',slides:['#7E9EB8']},
+  {title:'Chain Landing',tags:['Web3','Landing'],thumb:'/projects/chain-landing.jpg',externalLink:'',slides:['#9488C8']},
+  {title:'Data Collection',tags:['Dashboard','Tool'],thumb:'/projects/data-collection.jpg',externalLink:'',slides:['#8BA8C4']},
+  {title:'Skeuomorphic Buttons',tags:['UI','Exploration'],thumb:'/projects/skeu-buttons.jpg',externalLink:'',slides:['#A699D4']},
+  {title:'DealDoc Detail',tags:['SaaS','Dashboard'],thumb:'/projects/dealdoc-deal.jpg',externalLink:'',slides:['#7B98B4']},
+  {title:'Vercel Dashboard',tags:['Dashboard','Concept'],thumb:'/projects/vercel-dashboard.jpg',externalLink:'',slides:['#6E7EB8']},
+  {title:'MagicPath',tags:['Animation','Experiment'],thumb:'/projects/magicpath-3.mp4',externalLink:'',slides:['#B090C8']},
+  {title:'Card Tilt',tags:['Interaction','Experiment'],thumb:'/projects/card-tilt.mp4',externalLink:'',slides:['#8278B8']},
+  {title:'MagicPath Experiments',tags:['Animation','Experiment'],thumb:'/projects/magicpath-2.mp4',externalLink:'',slides:['#A080B8']},
+  {title:'DealDoc Demo',tags:['SaaS','Prototype'],thumb:'/projects/dealdoc-video.mp4',externalLink:'',slides:['#6B88A4']},
+] as const satisfies Project[]

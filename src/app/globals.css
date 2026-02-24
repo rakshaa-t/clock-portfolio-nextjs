@@ -1,0 +1,395 @@
+@import "tailwindcss";
+
+@font-face {
+  font-family: 'GeistPixel';
+  font-style: normal;
+  font-display: swap;
+  src: url(/fonts/GeistPixel.ttf) format('truetype');
+}
+
+/* ═══ DESIGN TOKENS ═══ */
+/* Complex tokens that don't map cleanly to Tailwind stay as CSS custom properties */
+
+:root {
+  /* Noise textures (inline SVG) */
+  --noise-felt: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  --noise-matte: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  --noise-paper: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.2' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  --noise-cardstock: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+
+  /* Directional light tokens (top-left overhead) */
+  --light-highlight: rgba(255,255,255,0.45);
+  --shadow-contact: rgba(0,0,0,0.25);
+  --shadow-cast: rgba(0,0,0,0.1);
+  --shadow-diffuse: rgba(0,0,0,0.06);
+
+  /* Skeuomorphic composite shadows (too complex for Tailwind config) */
+  --shadow-raised:
+    4px 4px 12px rgba(0,0,0,0.1),
+    -2px -2px 8px rgba(255,255,255,0.7),
+    inset 0 1px 0 rgba(255,255,255,0.6);
+  --shadow-inset:
+    inset 3px 3px 8px rgba(0,0,0,0.08),
+    inset -2px -2px 6px rgba(255,255,255,0.5);
+  --shadow-deep:
+    8px 8px 24px rgba(0,0,0,0.12),
+    -4px -4px 16px rgba(255,255,255,0.6),
+    inset 0 1px 0 rgba(255,255,255,0.8),
+    inset 0 -1px 0 rgba(0,0,0,0.04);
+  --shadow-object:
+    0 1px 2px var(--shadow-contact),
+    3px 5px 14px var(--shadow-cast);
+  --shadow-object-hover:
+    0 2px 4px rgba(0,0,0,0.18),
+    4px 8px 20px rgba(0,0,0,0.1),
+    8px 16px 48px rgba(0,0,0,0.06);
+  --shadow-object-pressed:
+    0 0.5px 1px var(--shadow-contact),
+    1px 2px 6px var(--shadow-cast);
+}
+
+/* ═══ TAILWIND THEME ═══ */
+@theme {
+  /* Colors */
+  --color-accent: #8B7EC8;
+  --color-accent-glow: rgba(139,126,200,0.35);
+  --color-accent-subtle: rgba(139,126,200,0.08);
+  --color-bg: #E4E0DA;
+  --color-bg-raised: #ECEAE6;
+  --color-bg-inset: #D9D5CF;
+  --color-text-primary: #3A3632;
+  --color-text-secondary: #8A857D;
+  --color-text-muted: #B0AAA2;
+
+  /* Fonts */
+  --font-pixel: 'GeistPixel', monospace;
+  --font-sans: 'Geist', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: 'Geist Mono', monospace;
+
+  /* Border radius */
+  --radius-xs: 4px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+
+  /* Easing (Emil Kowalski principles) */
+  --ease-smooth: cubic-bezier(0.32, 0.72, 0, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-expo: cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* Shadows — resolved values matching :root composites (can't use var() in @theme) */
+  --shadow-object: 0 1px 2px rgba(0,0,0,0.25), 3px 5px 14px rgba(0,0,0,0.1);
+  --shadow-object-hover: 0 2px 4px rgba(0,0,0,0.18), 4px 8px 20px rgba(0,0,0,0.1), 8px 16px 48px rgba(0,0,0,0.06);
+  --shadow-object-pressed: 0 0.5px 1px rgba(0,0,0,0.25), 1px 2px 6px rgba(0,0,0,0.1);
+}
+
+/* ═══ BASE STYLES ═══ */
+/* NOTE: Do NOT add * { margin:0; padding:0; } here — Tailwind v4 puts utilities
+   in @layer utilities, and unlayered CSS overrides layered CSS regardless of
+   specificity, which would break mx-auto, p-*, m-*, etc. Tailwind's Preflight
+   in @layer base already resets margins/padding/box-sizing. */
+
+@layer base {
+  html, body {
+    background: var(--color-bg);
+    color: var(--color-text-primary);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    overflow: auto;
+    height: auto;
+  }
+}
+
+/* ═══ REDUCED MOTION ═══ */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ═══ LED PULSE ═══ */
+@keyframes ledPulse {
+  0%, 100% { box-shadow: 0 0 3px rgba(52,199,89,0.5), 0 0 7px rgba(52,199,89,0.2); }
+  50% { box-shadow: 0 0 5px rgba(52,199,89,0.7), 0 0 12px rgba(52,199,89,0.3); }
+}
+
+/* ═══ PUZZLE GRID — hover and animation effects ═══ */
+/* Card hover: 3D tilt handled by JS, image shift + overlay reveal by CSS */
+@media (hover: hover) {
+  .puzzle-card:active {
+    transform: scale(0.97) !important;
+  }
+  .puzzle-card:hover > div:first-child {
+    transform: translateY(-28px);
+  }
+  .puzzle-card:hover > .puzzle-title-overlay {
+    transform: translateY(0) !important;
+  }
+}
+
+/* Staggered reveal animation for extra cards */
+.puzzle-extra-reveal {
+  animation: puzzleReveal 0.3s cubic-bezier(0.32, 0.72, 0, 1) forwards;
+  opacity: 0;
+  transform: translateY(12px);
+}
+@keyframes puzzleReveal {
+  to { opacity: 1; transform: translateY(0); }
+}
+.puzzle-collapsing .puzzle-extra-reveal {
+  display: none;
+}
+
+/* Modal body scroll fades */
+.modal-body-fade-bottom {
+  mask-image: linear-gradient(to bottom, #000 0%, #000 calc(100% - 32px), rgba(0,0,0,0.85) calc(100% - 20px), rgba(0,0,0,0.4) calc(100% - 10px), transparent 100%);
+}
+.modal-body-fade-top {
+  mask-image: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.4) 10px, rgba(0,0,0,0.85) 20px, #000 32px, #000 100%);
+}
+.modal-body-fade-both {
+  mask-image: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.4) 10px, rgba(0,0,0,0.85) 20px, #000 32px, #000 calc(100% - 32px), rgba(0,0,0,0.85) calc(100% - 20px), rgba(0,0,0,0.4) calc(100% - 10px), transparent 100%);
+}
+
+/* ═══ NOTE CARDS — hover and active states ═══ */
+@media (hover: hover) {
+  .note-card-link:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.06), 0 2px 6px rgba(0,0,0,0.04);
+    border-color: rgba(139,126,200,0.2);
+  }
+  .note-card-link:hover .note-card-title {
+    color: #8B7EC8;
+  }
+  .note-card-link:hover .note-card-tag {
+    background: rgba(139,126,200,0.08);
+    color: #8B7EC8;
+  }
+}
+.note-card-link:active {
+  transform: scale(0.97);
+}
+
+/* ═══ NOTE PAGE — individual note detail styles ═══ */
+.note-page-body {
+  font-size: 14px;
+  color: rgba(0,0,0,0.55);
+  line-height: 1.75;
+}
+.note-page-body p {
+  margin-bottom: 16px;
+}
+.note-code {
+  background: rgba(0,0,0,0.03);
+  border: 1px solid rgba(0,0,0,0.06);
+  border-radius: 10px;
+  padding: 12px 14px;
+  padding-right: 60px;
+  margin: 4px 0 0;
+  font-family: 'Geist Mono', monospace;
+  font-size: 11.5px;
+  line-height: 1.7;
+  color: rgba(0,0,0,0.55);
+  overflow-x: auto;
+  word-break: break-all;
+}
+.note-code .kw { color: #7B6BA5; }
+.note-code .fn { color: #5A7BAF; }
+.note-code .str { color: #6B8F5E; }
+.note-code .num { color: #B87A4A; }
+.note-code .cm { color: rgba(0,0,0,0.25); }
+.note-img {
+  width: 100%;
+  border-radius: 12px;
+  margin: 8px 0 4px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  overflow: hidden;
+  background: rgba(0,0,0,0.03);
+}
+.note-img img {
+  width: 100%;
+  display: block;
+  border-radius: 12px;
+}
+.note-img-caption {
+  font-size: 12px;
+  color: rgba(0,0,0,0.3);
+  margin: 6px 0 12px;
+  font-style: italic;
+}
+.note-callout {
+  background: rgba(139,126,200,0.06);
+  border-left: 3px solid #8B7EC8;
+  border-radius: 0 8px 8px 0;
+  padding: 12px 16px;
+  margin: 12px 0;
+  font-size: 13px;
+  color: rgba(0,0,0,0.5);
+  line-height: 1.6;
+}
+
+/* ═══ CTA BUTTON STATES ═══ */
+@media (hover: hover) {
+  .cta-primary:hover {
+    background: linear-gradient(180deg, #8B7EC8 0%, #7B6EBE 30%, #6B5CA8 70%, #6050A0 100%) !important;
+    box-shadow: 0 5px 0 0 #483C88, 0 10px 16px rgba(72,60,136,0.3) !important;
+    transform: translateY(-1px) !important;
+  }
+}
+.cta-primary:active {
+  background: linear-gradient(180deg, #6B5CA8 0%, #6050A0 30%, #5848A0 70%, #4E3F90 100%) !important;
+  box-shadow: 0 1px 0 0 #483C88, 0 2px 4px rgba(72,60,136,0.2) !important;
+  transform: translateY(3px) !important;
+}
+
+@media (hover: hover) {
+  .cta-icon:hover {
+    background: radial-gradient(ellipse at 35% 25%, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0) 60%), linear-gradient(180deg, #F8F5F1 0%, #E8E5E0 100%) !important;
+    box-shadow: 0 3px 0 0 #BAB6B0, 0 6px 10px rgba(0,0,0,0.08) !important;
+    transform: translateY(-1px) !important;
+    color: var(--color-text-secondary) !important;
+  }
+}
+.cta-icon:active {
+  box-shadow: 0 1px 0 0 #C4C0BA, 0 2px 3px rgba(0,0,0,0.04) !important;
+  transform: translateY(1px) !important;
+  color: var(--color-text-primary) !important;
+}
+
+/* ═══ BOOK COVER — hover z-index for tooltip visibility ═══ */
+.book-cover-item:hover {
+  z-index: 50 !important;
+}
+
+/* ═══ BOOK BADGE TOOLTIPS ═══ */
+/* NOTE: Do NOT set position here — the badge uses Tailwind `absolute` for overlay positioning.
+   position:absolute also establishes a containing block for ::before/::after pseudo-elements. */
+.book-badge[data-tip]::before {
+  content: '';
+  position: absolute;
+  top: calc(100% + 0px);
+  left: 50%;
+  transform: translateX(-50%);
+  border: 4px solid transparent;
+  border-bottom-color: var(--color-text-primary);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s cubic-bezier(0.32,0.72,0,1);
+  z-index: 10;
+}
+.book-badge[data-tip]::after {
+  content: attr(data-tip);
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%) translateY(-4px);
+  padding: 6px 12px;
+  border-radius: 8px;
+  background: var(--color-text-primary);
+  color: var(--color-bg);
+  font-family: 'Geist Mono', monospace;
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s cubic-bezier(0.32,0.72,0,1), transform 0.2s cubic-bezier(0.32,0.72,0,1);
+  z-index: 10;
+}
+.book-badge[data-tip]:hover::before {
+  opacity: 1;
+}
+.book-badge[data-tip]:hover::after {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* ═══ MYMIND CARD ACTIVE STATE (popover open) ═══ */
+.mm-card-active {
+  box-shadow: 0 0 0 1.5px var(--color-accent), 0 4px 16px rgba(139,126,200,0.12) !important;
+  transform: translateY(-1px) !important;
+}
+
+/* ═══ SCROLL-TO-TOP HOVER/ACTIVE ═══ */
+@media (hover: hover) {
+  [data-scroll-top]:hover {
+    color: var(--color-accent) !important;
+  }
+}
+[data-scroll-top]:active {
+  transform: translateY(-50%) scale(0.93) !important;
+}
+
+/* ═══ MOBILE RESPONSIVE — section padding + heading sizes ═══ */
+@media (max-width: 480px) {
+  #sec-about, #sec-work, #sec-notes, #sec-bookmarks, #sec-books {
+    padding: 36px 20px !important;
+  }
+  .font-pixel {
+    font-size: 24px !important;
+  }
+}
+
+/* ═══ TABLET — footer margin ═══ */
+@media (min-width: 481px) and (max-width: 768px) {
+  footer {
+    margin-bottom: 48px;
+  }
+}
+
+/* ═══ BOTTOM NAV — responsive overrides ═══ */
+@media (min-width: 481px) and (max-width: 768px) {
+  [data-bottom-nav] {
+    bottom: 12px;
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
+@media (min-width: 769px) {
+  [data-bottom-nav] {
+    left: 50% !important;
+    right: auto !important;
+    transform: translateX(-50%);
+    bottom: 16px !important;
+  }
+  [data-bottom-nav] .sound-knob-wrap { width: 34px; height: 34px; }
+  [data-bottom-nav] [data-knob] { width: 26px; height: 26px; }
+  [data-bottom-nav] [data-knob-dot] { width: 4px; height: 4px; margin-left: -2px; top: 4px; }
+  [data-bottom-nav] [data-nav-item] { flex: none; padding: 8px 12px; }
+}
+
+/* ═══ MYMIND POPOVER ═══ */
+.mm-popover-wrap {
+  position: absolute;
+  z-index: 1050;
+  pointer-events: none;
+  width: 52%;
+  min-width: 200px;
+}
+.mm-popover {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.06), 0 0 0 1px rgba(0,0,0,0.04);
+  padding: 16px;
+  opacity: 0;
+  transform: translateY(var(--pop-dir, 6px)) scale(0.96);
+  transition: opacity 0.15s cubic-bezier(0.32,0.72,0,1), transform 0.2s cubic-bezier(0.22,1.1,0.36,1);
+}
+.mm-popover-wrap.open {
+  pointer-events: auto;
+}
+.mm-popover-wrap.open .mm-popover {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+.mm-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  pointer-events: none;
+}
+.mm-scrim.open {
+  pointer-events: auto;
+}
