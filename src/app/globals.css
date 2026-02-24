@@ -141,6 +141,27 @@
   display: none;
 }
 
+/* ═══ MODAL — close button reveals on hover (desktop) ═══ */
+@media (hover: hover) {
+  [data-modal-card]:hover .modal-close-btn {
+    opacity: 1 !important;
+  }
+  .modal-close-btn:hover {
+    background: rgba(0,0,0,0.4) !important;
+    transform: scale(1.05) !important;
+  }
+  .modal-close-btn:active {
+    transform: scale(0.97) !important;
+  }
+  /* Carousel nav buttons reveal on hover */
+  [data-modal-card]:hover .carousel-nav-btn:not(:disabled) {
+    opacity: 1 !important;
+  }
+  .carousel-nav-btn:hover:not(:disabled) {
+    background: rgba(0,0,0,0.4) !important;
+  }
+}
+
 /* Modal body scroll fades */
 .modal-body-fade-bottom {
   mask-image: linear-gradient(to bottom, #000 0%, #000 calc(100% - 32px), rgba(0,0,0,0.85) calc(100% - 20px), rgba(0,0,0,0.4) calc(100% - 10px), transparent 100%);
@@ -232,29 +253,30 @@
 /* ═══ CTA BUTTON STATES ═══ */
 @media (hover: hover) {
   .cta-primary:hover {
-    background: linear-gradient(180deg, #8B7EC8 0%, #7B6EBE 30%, #6B5CA8 70%, #6050A0 100%) !important;
+    background: linear-gradient(180deg, #8A7AC6 0%, #7868B4 30%, #6C5CA8 70%, #6050A0 100%) !important;
     box-shadow: 0 5px 0 0 #483C88, 0 10px 16px rgba(72,60,136,0.3) !important;
     transform: translateY(-1px) !important;
   }
 }
 .cta-primary:active {
-  background: linear-gradient(180deg, #6B5CA8 0%, #6050A0 30%, #5848A0 70%, #4E3F90 100%) !important;
-  box-shadow: 0 1px 0 0 #483C88, 0 2px 4px rgba(72,60,136,0.2) !important;
+  background: linear-gradient(180deg, #6050A0 0%, #5848A0 40%, #4E4090 100%) !important;
+  box-shadow: 0 1px 0 0 #483C88, 0 2px 6px rgba(72,60,136,0.2) !important;
   transform: translateY(3px) !important;
+  text-shadow: 0 0 1px rgba(0,0,0,0.3) !important;
 }
 
 @media (hover: hover) {
   .cta-icon:hover {
     background: radial-gradient(ellipse at 35% 25%, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0) 60%), linear-gradient(180deg, #F8F5F1 0%, #E8E5E0 100%) !important;
-    box-shadow: 0 3px 0 0 #BAB6B0, 0 6px 10px rgba(0,0,0,0.08) !important;
+    box-shadow: 0 3px 0 0 #C4C0BA, 0 5px 8px rgba(0,0,0,0.08) !important;
     transform: translateY(-1px) !important;
-    color: var(--color-text-secondary) !important;
+    color: var(--color-accent) !important;
   }
 }
 .cta-icon:active {
-  box-shadow: 0 1px 0 0 #C4C0BA, 0 2px 3px rgba(0,0,0,0.04) !important;
-  transform: translateY(1px) !important;
-  color: var(--color-text-primary) !important;
+  box-shadow: 0 0 0 0 #C4C0BA, inset 0 2px 4px rgba(0,0,0,0.1) !important;
+  transform: translateY(2px) !important;
+  color: var(--color-accent) !important;
 }
 
 /* ═══ BOOK COVER — hover z-index for tooltip visibility ═══ */
@@ -331,12 +353,56 @@
   .font-pixel {
     font-size: 24px !important;
   }
+  /* Puzzle grid — force 140px rows on mobile like Astro */
+  #sec-work .grid {
+    grid-auto-rows: 140px;
+  }
+  #sec-work .grid > div .puzzle-card {
+    aspect-ratio: unset !important;
+    height: 100%;
+  }
+  /* Mymind search — smaller on mobile */
+  #sec-bookmarks input[type="text"] {
+    font-size: 20px !important;
+  }
+  /* Mymind — 2 columns on mobile */
+  #sec-bookmarks .flex.gap-2.max-w-\[520px\] {
+    column-count: 2;
+  }
+  /* Books — 3 columns + 10px gap on mobile */
+  #sec-books .grid {
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 10px !important;
+  }
+  /* Puzzle grid — 10px gap on mobile */
+  #sec-work .grid {
+    gap: 10px !important;
+  }
+  /* Strip specular highlights from puzzle cards on mobile */
+  .puzzle-card .absolute.inset-0.rounded-xl {
+    display: none !important;
+  }
+  /* Stack cards tighter on mobile */
+  .stack-card-item {
+    padding: 6px 8px !important;
+    margin-left: -22px !important;
+  }
+  .stack-card-item:first-child {
+    margin-left: 0 !important;
+  }
+  /* Books grid — tighter gap on mobile like Astro */
+  #sec-books .grid {
+    gap: 10px !important;
+  }
 }
 
-/* ═══ TABLET — footer margin ═══ */
+/* ═══ TABLET — footer margin + page padding ═══ */
 @media (min-width: 481px) and (max-width: 768px) {
   footer {
     margin-bottom: 48px;
+  }
+  main.min-h-screen {
+    padding-bottom: 72px !important;
   }
 }
 
@@ -354,10 +420,15 @@
     transform: translateX(-50%);
     bottom: 16px !important;
   }
-  [data-bottom-nav] .sound-knob-wrap { width: 34px; height: 34px; }
-  [data-bottom-nav] [data-knob] { width: 26px; height: 26px; }
-  [data-bottom-nav] [data-knob-dot] { width: 4px; height: 4px; margin-left: -2px; top: 4px; }
+  /* Hide mobile sound knob in nav on desktop — standalone knob handles it */
+  [data-bottom-nav] .sound-knob-wrap { display: none !important; }
   [data-bottom-nav] [data-nav-item] { flex: none; padding: 8px 12px; }
+}
+
+/* ═══ DESKTOP SOUND KNOB — hover tooltip ═══ */
+.sound-knob-desktop-wrap:hover .knob-tooltip-desktop {
+  opacity: 1 !important;
+  transform: translateY(-50%) translateX(0) !important;
 }
 
 /* ═══ MYMIND POPOVER ═══ */

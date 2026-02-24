@@ -215,30 +215,30 @@ export function ProjectModal({ project, open, onClose }: ProjectModalProps) {
           <button
             disabled={slideIdx === 0}
             onClick={() => setSlideIdx((p) => Math.max(0, p - 1))}
-            className="absolute top-1/2 left-3 w-8 h-8 rounded-full flex items-center justify-center cursor-pointer border-0 text-white/85"
+            className="carousel-nav-btn absolute top-1/2 left-3 w-8 h-8 rounded-full flex items-center justify-center cursor-pointer border-0 text-white/85"
             style={{
               transform: 'translateY(-50%)',
               background: 'rgba(0,0,0,0.25)',
               backdropFilter: 'blur(8px)',
-              opacity: slideIdx === 0 ? 0.2 : undefined,
+              opacity: slideIdx === 0 ? 0.2 : 0.45,
               transition: 'opacity 0.2s cubic-bezier(0.32,0.72,0,1)',
             }}
           >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+            <svg width="10" height="16" viewBox="0 0 10 16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="8 2 2 8 8 14"/></svg>
           </button>
           <button
             disabled={slideIdx === totalSlides - 1}
             onClick={() => setSlideIdx((p) => Math.min(totalSlides - 1, p + 1))}
-            className="absolute top-1/2 right-3 w-8 h-8 rounded-full flex items-center justify-center cursor-pointer border-0 text-white/85"
+            className="carousel-nav-btn absolute top-1/2 right-3 w-8 h-8 rounded-full flex items-center justify-center cursor-pointer border-0 text-white/85"
             style={{
               transform: 'translateY(-50%)',
               background: 'rgba(0,0,0,0.25)',
               backdropFilter: 'blur(8px)',
-              opacity: slideIdx === totalSlides - 1 ? 0.2 : undefined,
+              opacity: slideIdx === totalSlides - 1 ? 0.2 : 0.45,
               transition: 'opacity 0.2s cubic-bezier(0.32,0.72,0,1)',
             }}
           >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+            <svg width="10" height="16" viewBox="0 0 10 16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="2 2 8 8 2 14"/></svg>
           </button>
         </>
       )}
@@ -257,7 +257,8 @@ export function ProjectModal({ project, open, onClose }: ProjectModalProps) {
             transition: 'background 0.15s cubic-bezier(0.32,0.72,0,1)',
           }}
         >
-          View case study
+          View full case study
+          <svg className="inline ml-1 -mt-0.5" width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 12L12 4"/><path d="M5 4h7v7"/></svg>
         </a>
       )}
     </div>
@@ -359,7 +360,7 @@ export function ProjectModal({ project, open, onClose }: ProjectModalProps) {
   return (
     <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
       <DialogContent
-        className="w-[min(520px,90vw)] rounded-2xl p-0"
+        className="w-[min(560px,90vw)] rounded-2xl p-0"
         style={{
           maxHeight: '85vh',
           background: '#EDEAE6',
@@ -369,6 +370,7 @@ export function ProjectModal({ project, open, onClose }: ProjectModalProps) {
         <DialogTitle className="sr-only">{project.title}</DialogTitle>
         <div
           ref={modalCardRef}
+          data-modal-card
           className="rounded-2xl overflow-hidden flex flex-col relative"
           style={{
             height: hasBody ? 'min(85vh, 520px)' : 'min(85vh, 520px)',
@@ -384,7 +386,7 @@ export function ProjectModal({ project, open, onClose }: ProjectModalProps) {
         {/* Close button */}
         <button
           onClick={onClose}
-          className="absolute top-3 right-3 w-8 h-8 rounded-full flex items-center justify-center cursor-pointer border-0 text-white/85 text-[13px] z-10"
+          className="modal-close-btn absolute top-3 right-3 w-8 h-8 rounded-full flex items-center justify-center cursor-pointer border-0 text-white/85 text-[13px] z-10"
           style={{
             background: 'rgba(0,0,0,0.25)',
             backdropFilter: 'blur(8px)',

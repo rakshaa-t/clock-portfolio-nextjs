@@ -17,12 +17,8 @@ export function MymindSection() {
   const [activeCardEl, setActiveCardEl] = useState<HTMLElement | null>(null)
   const gridRef = useRef<HTMLDivElement>(null)
 
-  // Derive unique categories from data
-  const categories = useMemo(() => {
-    const cats = new Set<string>()
-    MMIND_CARDS.forEach((card) => cats.add(card.category))
-    return ['all', ...Array.from(cats)]
-  }, [])
+  // Match Astro's hardcoded filter pill order
+  const categories = ['all', 'animation', 'ui design', 'tools', 'inspiration', 'notes']
 
   // Filter cards by category and search
   const filteredCards = useMemo(() => {
@@ -151,7 +147,9 @@ export function MymindSection() {
             active={activeFilter === cat}
             onClick={() => handleFilterClick(cat)}
           >
-            {cat === 'all' ? 'All' : cat.charAt(0).toUpperCase() + cat.slice(1)}
+            {cat === 'all' ? 'All'
+              : cat === 'ui design' ? 'UI Design'
+              : cat.charAt(0).toUpperCase() + cat.slice(1)}
           </FilterPill>
         ))}
       </div>

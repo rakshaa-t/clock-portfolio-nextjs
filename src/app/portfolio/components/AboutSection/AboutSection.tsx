@@ -194,8 +194,9 @@ export function AboutSection() {
             href="https://cal.com/raksha-tated-v2ee58/15min"
             className="text-text-primary underline decoration-[rgba(0,0,0,0.15)] underline-offset-2 transition-[text-decoration-color] duration-200 hover:decoration-[rgba(0,0,0,0.4)]"
             style={{ transitionTimingFunction: 'cubic-bezier(0.32,0.72,0,1)' }}
-            target="_blank"
-            rel="noopener noreferrer"
+            data-cal-link="raksha-tated-v2ee58/15min"
+            data-cal-config='{"layout":"month_view"}'
+            onClick={(e) => e.preventDefault()}
           >
             book a call
           </a>{' '}
@@ -227,6 +228,9 @@ export function AboutSection() {
           <a
             href="https://cal.com/raksha-tated-v2ee58/15min?user=raksha-tated-v2ee58"
             className="cta-primary block relative no-underline text-white font-sans text-[14px] font-semibold tracking-[0.03em]"
+            data-cal-link="raksha-tated-v2ee58/15min"
+            data-cal-config='{"layout":"month_view"}'
+            onClick={(e) => e.preventDefault()}
             style={{
               padding: '16px 40px',
               borderRadius: 'var(--radius-md)',
@@ -237,8 +241,6 @@ export function AboutSection() {
               transition:
                 'transform 0.08s cubic-bezier(0.32,0.72,0,1), box-shadow 0.08s cubic-bezier(0.32,0.72,0,1)',
             }}
-            target="_blank"
-            rel="noopener noreferrer"
             onMouseDown={() => clickSound('primary')}
             onTouchStart={() => clickSound('primary')}
           >

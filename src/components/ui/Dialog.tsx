@@ -52,7 +52,7 @@ function DialogContent({
 
           // Desktop: centered card
           'left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2',
-          'max-w-[520px] w-[90vw] max-h-[85vh]',
+          'max-w-[560px] w-[90vw] max-h-[85vh]',
           'rounded-2xl p-6',
 
           // Animations — desktop (scale + fade)

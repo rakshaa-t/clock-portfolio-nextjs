@@ -206,7 +206,7 @@ export function BottomNav() {
             height: 'calc(100% - 4px)',
             borderRadius: 100,
             background: 'linear-gradient(180deg, #F6F3EF 0%, #EDEAE5 40%, #E6E3DE 100%)',
-            boxShadow: '0 1px 3px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.8)',
+            boxShadow: '0 2px 4px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.9)',
             transform: 'translateY(-50%)',
             transition: 'left 0.3s cubic-bezier(0.32,0.72,0,1), width 0.3s cubic-bezier(0.32,0.72,0,1)',
             willChange: 'transform,width',
