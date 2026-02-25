@@ -63,24 +63,17 @@ export function PuzzleGrid({ onCardClick }: PuzzleGridProps) {
 
   function handleCardClick(proj: Project) {
     playNoteClick()
-    if (isMobile) {
-      // Mobile: direct link or no-op
-      const hasLink = proj.link && proj.link !== '#' && !proj.comingSoon
-      const hasExternal = proj.externalLink
-      if (hasLink) {
-        window.open(proj.link!, '_blank')
-      } else if (hasExternal) {
-        window.open(proj.externalLink!, '_blank')
-      }
-      return
-    }
-    // Desktop: open modal or external link
+
+    // External link cards — open in new tab (both mobile & desktop)
     if ('externalLink' in proj) {
       if (proj.externalLink) {
         window.open(proj.externalLink, '_blank')
       }
+      // Empty externalLink = no-op (non-clickable)
       return
     }
+
+    // All other cards — open modal (both mobile & desktop, matching Astro)
     onCardClick(proj)
   }
 
@@ -98,9 +91,8 @@ export function PuzzleGrid({ onCardClick }: PuzzleGridProps) {
           const isExtra = idx >= INITIAL_COUNT
           const thumbSrc = proj.thumb ?? null
           const isVideo = thumbSrc?.endsWith('.mp4')
-          const isClickable = isMobile
-            ? !!(proj.link && proj.link !== '#' && !proj.comingSoon) || !!proj.externalLink
-            : !('externalLink' in proj && !proj.externalLink)
+          // Clickable: anything that's not an empty externalLink
+          const isClickable = !('externalLink' in proj && !proj.externalLink)
 
           return (
             <motion.div
@@ -135,7 +127,7 @@ export function PuzzleGrid({ onCardClick }: PuzzleGridProps) {
             >
               {/* Image/video */}
               <div
-                className="w-full h-full transition-transform duration-300"
+                className="puzzle-img-wrap w-full h-full transition-transform duration-300"
                 style={{ transitionTimingFunction: 'cubic-bezier(0.32,0.72,0,1)' }}
               >
                 {thumbSrc ? (
@@ -181,7 +173,7 @@ export function PuzzleGrid({ onCardClick }: PuzzleGridProps) {
               {/* Specular highlight (desktop only) */}
               {!isMobile && (
                 <div
-                  className="absolute inset-0 rounded-xl pointer-events-none z-[2]"
+                  className="puzzle-specular absolute inset-0 rounded-xl pointer-events-none z-[2]"
                   style={{
                     background: 'radial-gradient(ellipse at 30% 25%, rgba(255,255,255,0.18) 0%, transparent 55%)',
                     transition: 'opacity 0.2s cubic-bezier(0.32,0.72,0,1)',

@@ -83,11 +83,6 @@
 }
 
 /* ═══ BASE STYLES ═══ */
-/* NOTE: Do NOT add * { margin:0; padding:0; } here — Tailwind v4 puts utilities
-   in @layer utilities, and unlayered CSS overrides layered CSS regardless of
-   specificity, which would break mx-auto, p-*, m-*, etc. Tailwind's Preflight
-   in @layer base already resets margins/padding/box-sizing. */
-
 @layer base {
   html, body {
     background: var(--color-bg);
@@ -115,16 +110,18 @@
 }
 
 /* ═══ PUZZLE GRID — hover and animation effects ═══ */
-/* Card hover: 3D tilt handled by JS, image shift + overlay reveal by CSS */
 @media (hover: hover) {
   .puzzle-card:active {
     transform: scale(0.97) !important;
   }
-  .puzzle-card:hover > div:first-child {
+  .puzzle-card:hover > .puzzle-img-wrap {
     transform: translateY(-28px);
   }
   .puzzle-card:hover > .puzzle-title-overlay {
     transform: translateY(0) !important;
+  }
+  .puzzle-card:hover > .puzzle-specular {
+    opacity: 0.7;
   }
 }
 
@@ -141,9 +138,15 @@
   display: none;
 }
 
-/* ═══ MODAL — close button reveals on hover (desktop) ═══ */
+/* ═══ MODAL — carousel scrollbar hidden + hover reveals ═══ */
+/* Hide carousel scrollbar */
+.carousel-slide::-webkit-scrollbar,
+.modal-overlay div[style*="overflowX"]::-webkit-scrollbar {
+  display: none;
+}
+/* Hover: reveal close + nav buttons on desktop */
 @media (hover: hover) {
-  [data-modal-card]:hover .modal-close-btn {
+  .modal-overlay [role="dialog"]:hover .modal-close-btn {
     opacity: 1 !important;
   }
   .modal-close-btn:hover {
@@ -153,24 +156,23 @@
   .modal-close-btn:active {
     transform: scale(0.97) !important;
   }
-  /* Carousel nav buttons reveal on hover */
-  [data-modal-card]:hover .carousel-nav-btn:not(:disabled) {
+  .modal-overlay [role="dialog"]:hover .carousel-nav-btn:not(:disabled) {
     opacity: 1 !important;
   }
   .carousel-nav-btn:hover:not(:disabled) {
     background: rgba(0,0,0,0.4) !important;
+    transform: translateY(-50%) scale(1.05) !important;
   }
-}
-
-/* Modal body scroll fades */
-.modal-body-fade-bottom {
-  mask-image: linear-gradient(to bottom, #000 0%, #000 calc(100% - 32px), rgba(0,0,0,0.85) calc(100% - 20px), rgba(0,0,0,0.4) calc(100% - 10px), transparent 100%);
-}
-.modal-body-fade-top {
-  mask-image: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.4) 10px, rgba(0,0,0,0.85) 20px, #000 32px, #000 100%);
-}
-.modal-body-fade-both {
-  mask-image: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.4) 10px, rgba(0,0,0,0.85) 20px, #000 32px, #000 calc(100% - 32px), rgba(0,0,0,0.85) calc(100% - 20px), rgba(0,0,0,0.4) calc(100% - 10px), transparent 100%);
+  .carousel-nav-btn:active:not(:disabled) {
+    transform: translateY(-50%) scale(0.97) !important;
+  }
+  /* Modal tag link hover */
+  .modal-tag-link:hover {
+    background: rgba(139,126,200,0.15) !important;
+  }
+  .modal-tag-link:active {
+    transform: scale(0.97);
+  }
 }
 
 /* ═══ NOTE CARDS — hover and active states ═══ */
@@ -285,8 +287,6 @@
 }
 
 /* ═══ BOOK BADGE TOOLTIPS ═══ */
-/* NOTE: Do NOT set position here — the badge uses Tailwind `absolute` for overlay positioning.
-   position:absolute also establishes a containing block for ::before/::after pseudo-elements. */
 .book-badge[data-tip]::before {
   content: '';
   position: absolute;
@@ -379,7 +379,7 @@
     gap: 10px !important;
   }
   /* Strip specular highlights from puzzle cards on mobile */
-  .puzzle-card .absolute.inset-0.rounded-xl {
+  .puzzle-specular {
     display: none !important;
   }
   /* Stack cards tighter on mobile */
@@ -389,10 +389,6 @@
   }
   .stack-card-item:first-child {
     margin-left: 0 !important;
-  }
-  /* Books grid — tighter gap on mobile like Astro */
-  #sec-books .grid {
-    gap: 10px !important;
   }
 }
 
@@ -423,6 +419,15 @@
   /* Hide mobile sound knob in nav on desktop — standalone knob handles it */
   [data-bottom-nav] .sound-knob-wrap { display: none !important; }
   [data-bottom-nav] [data-nav-item] { flex: none; padding: 8px 12px; }
+  /* Desktop knob slightly larger */
+  .sound-knob-desktop-wrap .sound-knob-wrap { width: 34px; height: 34px; }
+  .sound-knob-desktop-wrap .sound-knob-wrap button { width: 26px; height: 26px; }
+  .sound-knob-desktop-wrap .sound-knob-wrap [data-knob-dot] {
+    width: 4px !important;
+    height: 4px !important;
+    margin-left: -2px !important;
+    top: 4px !important;
+  }
 }
 
 /* ═══ DESKTOP SOUND KNOB — hover tooltip ═══ */

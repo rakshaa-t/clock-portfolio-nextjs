@@ -108,11 +108,18 @@ export function BottomNav() {
         bottom: 'calc(12px + env(safe-area-inset-bottom, 0px))',
         left: 20,
         right: 20,
+        padding: 4,
+        borderRadius: 100,
+        background: '#DDD9D3',
+        boxShadow: '0 4px 12px rgba(0,0,0,0.1), 0 1px 3px rgba(0,0,0,0.06)',
+        border: '1px solid rgba(255,255,255,0.3)',
       }}
     >
       {/* ── Sound Knob ── */}
-      <div className="sound-knob-wrap relative w-8 h-8 shrink-0 rounded-full flex items-center justify-center"
+      <div className="sound-knob-wrap relative shrink-0 rounded-full flex items-center justify-center"
         style={{
+          width: 32,
+          height: 32,
           background: 'radial-gradient(circle, #D8D4CE 0%, #E0DDD8 60%, #E4E0DA 100%)',
           boxShadow: `
             inset 0 2px 6px rgba(0,0,0,0.1),
@@ -185,17 +192,10 @@ export function BottomNav() {
         </button>
       </div>
 
-      {/* ── Nav Pill ── */}
+      {/* ── Nav Pill (items inside, no separate background — inherits from nav bar) ── */}
       <div
         ref={pillRef}
         className="relative flex items-center flex-1"
-        style={{
-          background: '#DDD9D3',
-          border: '1px solid rgba(255,255,255,0.3)',
-          borderRadius: 100,
-          padding: 4,
-          boxShadow: '0 4px 12px rgba(0,0,0,0.1), 0 1px 3px rgba(0,0,0,0.06)',
-        }}
       >
         {/* Sliding highlight */}
         <div
@@ -222,7 +222,7 @@ export function BottomNav() {
             className={cn(
               'relative z-[1] flex-1 text-center',
               'font-mono text-[12px] font-medium tracking-[0.01em]',
-              'py-2 px-0 md:px-3 cursor-pointer border-0 bg-transparent',
+              'py-2 px-0 cursor-pointer border-0 bg-transparent',
               'whitespace-nowrap select-none',
               'transition-colors duration-200',
               'active:scale-[0.97]',
