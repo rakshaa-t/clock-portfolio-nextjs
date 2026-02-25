@@ -17,6 +17,7 @@ export function MymindPopover({ card, cardEl, gridEl, open, onClose }: MymindPop
   const wrapRef = useRef<HTMLDivElement>(null)
   const innerRef = useRef<HTMLDivElement>(null)
   const [copied, setCopied] = useState(false)
+  const copyTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const [pos, setPos] = useState({ top: 0, left: 0, width: 280, originX: '50%', popDir: '6px' })
 
   // Position popover on desktop (sync before paint)
@@ -77,9 +78,15 @@ export function MymindPopover({ card, cardEl, gridEl, open, onClose }: MymindPop
     return () => window.removeEventListener('scroll', onScroll, { capture: true })
   }, [open, isMobile, onClose])
 
-  // Reset copied on close
+  // Reset copied on close and clear any pending timeout
   useEffect(() => {
-    if (!open) setCopied(false)
+    if (!open) {
+      setCopied(false)
+      if (copyTimerRef.current) {
+        clearTimeout(copyTimerRef.current)
+        copyTimerRef.current = null
+      }
+    }
   }, [open])
 
   // Focus close button on open
@@ -95,7 +102,11 @@ export function MymindPopover({ card, cardEl, gridEl, open, onClose }: MymindPop
     const text = card.url && card.url !== '#' ? card.url : ('text' in card ? card.text : card.title)
     navigator.clipboard.writeText(text).then(() => {
       setCopied(true)
-      setTimeout(() => setCopied(false), 1500)
+      if (copyTimerRef.current) clearTimeout(copyTimerRef.current)
+      copyTimerRef.current = setTimeout(() => {
+        setCopied(false)
+        copyTimerRef.current = null
+      }, 1500)
     })
   }, [card])
 

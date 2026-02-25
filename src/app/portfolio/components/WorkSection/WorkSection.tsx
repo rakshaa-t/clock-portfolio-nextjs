@@ -11,9 +11,11 @@ const EASE_SMOOTH: [number, number, number, number] = [0.32, 0.72, 0, 1]
 export function WorkSection() {
   const [selectedProject, setSelectedProject] = useState<Project | null>(null)
   const [modalOpen, setModalOpen] = useState(false)
+  const [triggerEl, setTriggerEl] = useState<HTMLElement | null>(null)
 
-  function handleCardClick(project: Project) {
+  function handleCardClick(project: Project, el: HTMLElement) {
     setSelectedProject(project)
+    setTriggerEl(el)
     setModalOpen(true)
   }
 
@@ -54,6 +56,7 @@ export function WorkSection() {
         project={selectedProject}
         open={modalOpen}
         onClose={handleClose}
+        triggerEl={triggerEl}
       />
     </section>
   )

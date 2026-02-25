@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 
 // ═══ SSR-SAFE MEDIA QUERY HOOK ═══
 // Returns false during server render, hydrates correctly on client,
@@ -9,11 +9,6 @@ import { useCallback, useEffect, useState } from 'react'
 export function useMatchMedia(query: string): boolean {
   // Start with false for SSR — avoids hydration mismatch
   const [matches, setMatches] = useState(false)
-
-  const getMatches = useCallback((): boolean => {
-    if (typeof window === 'undefined') return false
-    return window.matchMedia(query).matches
-  }, [query])
 
   useEffect(() => {
     const mql = window.matchMedia(query)
@@ -30,7 +25,7 @@ export function useMatchMedia(query: string): boolean {
     return () => {
       mql.removeEventListener('change', handleChange)
     }
-  }, [query, getMatches])
+  }, [query])
 
   return matches
 }

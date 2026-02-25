@@ -9,13 +9,14 @@ interface ProjectModalProps {
   project: Project | null
   open: boolean
   onClose: () => void
+  triggerEl?: HTMLElement | null
 }
 
 const TILT_MAX = 0.6
 const PLACEHOLDER_DESC =
   'A detailed case study for this project is coming soon. Check back for an in-depth look at the design process, challenges, and outcomes.'
 
-export function ProjectModal({ project, open, onClose }: ProjectModalProps) {
+export function ProjectModal({ project, open, onClose, triggerEl }: ProjectModalProps) {
   const isMobile = useMatchMedia('(max-width: 480px)')
   const [slideIdx, setSlideIdx] = useState(0)
   const [mounted, setMounted] = useState(false)
@@ -30,9 +31,14 @@ export function ProjectModal({ project, open, onClose }: ProjectModalProps) {
   const tiltRaf = useRef<number | null>(null)
   const tiltRect = useRef({ cx: 0, cy: 0, w: 0, h: 0 })
   const openRef = useRef(false)
+  // Guard: ignore observer updates during programmatic carousel scrolls
+  const scrollingRef = useRef(false)
 
-  // Mount portal on client
-  useEffect(() => { setMounted(true) }, [])
+  // Mount portal on client + ensure body overflow restored on unmount
+  useEffect(() => {
+    setMounted(true)
+    return () => { document.body.style.overflow = '' }
+  }, [])
 
   // Keep openRef in sync
   useEffect(() => { openRef.current = open }, [open])
@@ -152,6 +158,7 @@ export function ProjectModal({ project, open, onClose }: ProjectModalProps) {
 
     const observer = new IntersectionObserver(
       (entries) => {
+        if (scrollingRef.current) return
         for (const entry of entries) {
           if (entry.isIntersecting) {
             const idx = [...slides].indexOf(entry.target as Element)
@@ -165,17 +172,50 @@ export function ProjectModal({ project, open, onClose }: ProjectModalProps) {
     return () => observer.disconnect()
   }, [open, project])
 
-  // ── Keyboard nav ──
+  // ── Keyboard nav + focus trap (matches Astro portfolio-core.js) ──
   useEffect(() => {
     if (!open) return
+
+    // Focus close button on open
+    requestAnimationFrame(() => {
+      overlayRef.current?.querySelector<HTMLButtonElement>('.modal-close-btn')?.focus()
+    })
+
     function onKey(e: KeyboardEvent) {
       if (e.key === 'Escape') { onClose(); return }
       if (e.key === 'ArrowRight') { scrollToSlide(slideIdx + 1); return }
       if (e.key === 'ArrowLeft') { scrollToSlide(slideIdx - 1); return }
+      // Focus trap: wrap Tab/Shift+Tab within modal
+      if (e.key === 'Tab') {
+        const overlay = overlayRef.current
+        if (!overlay) return
+        const focusable = overlay.querySelectorAll<HTMLElement>(
+          'button:not([disabled]), a[href], input, [tabindex]:not([tabindex="-1"])'
+        )
+        if (!focusable.length) return
+        const first = focusable[0]
+        const last = focusable[focusable.length - 1]
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault()
+          last.focus()
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault()
+          first.focus()
+        }
+      }
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
   }, [open, slideIdx, onClose])
+
+  // ── Focus restore on close (matches Astro _modalTrigger pattern) ──
+  const prevOpenRef = useRef(false)
+  useEffect(() => {
+    if (prevOpenRef.current && !open && triggerEl) {
+      triggerEl.focus()
+    }
+    prevOpenRef.current = open
+  }, [open, triggerEl])
 
   // ── Description scroll fade ──
   const checkDescFade = useCallback(() => {
@@ -195,11 +235,14 @@ export function ProjectModal({ project, open, onClose }: ProjectModalProps) {
     const slides = carouselScrollRef.current.querySelectorAll('.carousel-slide')
     const slide = slides[clamped] as HTMLElement
     if (!slide) return
-    // Custom smooth scroll
+    // Set slide index immediately for responsive UI
+    setSlideIdx(clamped)
+    // Custom smooth scroll — guard observer during animation
+    scrollingRef.current = true
     const startLeft = carouselScrollRef.current.scrollLeft
     const targetLeft = slide.offsetLeft
     const diff = targetLeft - startLeft
-    if (Math.abs(diff) < 2) return
+    if (Math.abs(diff) < 2) { scrollingRef.current = false; return }
     const duration = Math.min(400, Math.max(200, Math.abs(diff) * 0.4))
     const startTime = performance.now()
     function easeOut(t: number) { return 1 - Math.pow(1 - t, 3) }
@@ -208,7 +251,11 @@ export function ProjectModal({ project, open, onClose }: ProjectModalProps) {
       if (carouselScrollRef.current) {
         carouselScrollRef.current.scrollLeft = startLeft + diff * easeOut(progress)
       }
-      if (progress < 1) requestAnimationFrame(step)
+      if (progress < 1) {
+        requestAnimationFrame(step)
+      } else {
+        scrollingRef.current = false
+      }
     }
     requestAnimationFrame(step)
   }

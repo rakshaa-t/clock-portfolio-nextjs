@@ -60,6 +60,13 @@ export function BottomNav() {
     return () => ro.disconnect()
   }, [measureHighlight])
 
+  // Clean up toast timer on unmount
+  useEffect(() => {
+    return () => {
+      if (toastTimerRef.current) clearTimeout(toastTimerRef.current)
+    }
+  }, [])
+
   // ── Scroll-to-top visibility ──
   useEffect(() => {
     function onScroll() {

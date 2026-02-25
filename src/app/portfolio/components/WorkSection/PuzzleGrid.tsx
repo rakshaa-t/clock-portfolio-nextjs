@@ -12,7 +12,7 @@ const EASE_SMOOTH: [number, number, number, number] = [0.32, 0.72, 0, 1]
 const TILT_MAX = 4 // degrees — matches Astro
 
 interface PuzzleGridProps {
-  onCardClick: (project: Project) => void
+  onCardClick: (project: Project, el: HTMLElement) => void
 }
 
 const INITIAL_COUNT = 6
@@ -61,7 +61,7 @@ export function PuzzleGrid({ onCardClick }: PuzzleGridProps) {
     }
   }
 
-  function handleCardClick(proj: Project) {
+  function handleCardClick(proj: Project, cardEl: HTMLElement) {
     playNoteClick()
 
     // External link cards — open in new tab (both mobile & desktop)
@@ -74,7 +74,7 @@ export function PuzzleGrid({ onCardClick }: PuzzleGridProps) {
     }
 
     // All other cards — open modal (both mobile & desktop, matching Astro)
-    onCardClick(proj)
+    onCardClick(proj, cardEl)
   }
 
   return (
@@ -121,7 +121,7 @@ export function PuzzleGrid({ onCardClick }: PuzzleGridProps) {
                 transformStyle: 'preserve-3d',
                 animationDelay: isExtra ? `${(idx - INITIAL_COUNT) * 0.04}s` : undefined,
               }}
-              onClick={() => isClickable && handleCardClick(proj)}
+              onClick={(e) => isClickable && handleCardClick(proj, e.currentTarget)}
               onMouseMove={handleMouseMove}
               onMouseLeave={handleMouseLeave}
             >

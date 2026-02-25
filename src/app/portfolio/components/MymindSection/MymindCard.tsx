@@ -22,7 +22,7 @@ function MymindCard({ card, active, onClick, className }: MymindCardProps) {
         if (ref.current && onClick) onClick(ref.current)
       }}
       className={cn(
-        'block rounded-xl overflow-hidden cursor-pointer relative no-underline',
+        'mm-card block rounded-xl overflow-hidden cursor-pointer relative no-underline',
         'transition-[transform,box-shadow] duration-200',
         'ease-[cubic-bezier(0.32,0.72,0,1)]',
         'hover:translate-y-[-2px] hover:shadow-[0_6px_20px_rgba(0,0,0,0.08),0_2px_6px_rgba(0,0,0,0.04)]',

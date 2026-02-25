@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useRef, useState, useMemo } from 'react'
+import { useCallback, useEffect, useRef, useState, useMemo } from 'react'
 import { MMIND_CARDS } from '@/data/mymind'
 import type { MymindCard } from '@/types'
 import { FilterPill, ShowMoreButton } from '@/components/ui'
@@ -16,6 +16,51 @@ export function MymindSection() {
   const [activeIdx, setActiveIdx] = useState<number | null>(null)
   const [activeCardEl, setActiveCardEl] = useState<HTMLElement | null>(null)
   const gridRef = useRef<HTMLDivElement>(null)
+  const prevExpandedRef = useRef(false)
+
+  // WAAPI stagger on expand (matches Astro mymind-flat.js)
+  useEffect(() => {
+    if (expanded && !prevExpandedRef.current && gridRef.current) {
+      // Find extra cards — they all have the mm-card class
+      // After expanding, animate all newly visible cards
+      requestAnimationFrame(() => {
+        const grid = gridRef.current
+        if (!grid) return
+        const allCards = [...grid.querySelectorAll<HTMLElement>('.mm-card')]
+        // Extra cards are those beyond INITIAL_COUNT
+        const extras = allCards.slice(INITIAL_COUNT)
+        if (!extras.length) return
+
+        // Sort by visual position (top-to-bottom, left-to-right)
+        extras.sort((a, b) => {
+          const ra = a.getBoundingClientRect()
+          const rb = b.getBoundingClientRect()
+          return ra.top - rb.top || ra.left - rb.left
+        })
+
+        const stagger = 50
+        extras.forEach((el, i) => {
+          const anim = el.animate(
+            [
+              { opacity: 0, transform: 'translateY(12px)' },
+              { opacity: 1, transform: 'translateY(0)' },
+            ],
+            {
+              duration: 300,
+              delay: i * stagger,
+              easing: 'cubic-bezier(0.32, 0.72, 0, 1)',
+              fill: 'forwards',
+            }
+          )
+          anim.onfinish = () => {
+            el.style.opacity = '1'
+            el.style.transform = 'translateY(0)'
+          }
+        })
+      })
+    }
+    prevExpandedRef.current = expanded
+  }, [expanded])
 
   // Match Astro's hardcoded filter pill order
   const categories = ['all', 'animation', 'ui design', 'tools', 'inspiration', 'notes']
@@ -62,6 +107,7 @@ export function MymindSection() {
     setActiveFilter(cat)
     setExpanded(false)
     setActiveIdx(null)
+    setActiveCardEl(null)
   }
 
   function handleToggleExpand() {
@@ -69,6 +115,7 @@ export function MymindSection() {
   }
 
   const handleCardClick = useCallback((globalIdx: number, el: HTMLElement) => {
+    // Astro mymind has no click sound — only toggle popover
     if (activeIdx === globalIdx) {
       setActiveIdx(null)
       setActiveCardEl(null)
@@ -131,6 +178,7 @@ export function MymindSection() {
             setSearch(e.target.value)
             setExpanded(false)
             setActiveIdx(null)
+            setActiveCardEl(null)
           }}
           className="w-full border-none outline-none bg-transparent font-sans text-2xl font-light italic text-text-primary tracking-[-0.01em] placeholder:text-black/20 placeholder:italic"
         />
@@ -160,6 +208,7 @@ export function MymindSection() {
           cards={visibleCards}
           activeIdx={activeIdx}
           onCardClick={handleCardClick}
+          initialCount={expanded ? INITIAL_COUNT : undefined}
         />
       </div>
 
