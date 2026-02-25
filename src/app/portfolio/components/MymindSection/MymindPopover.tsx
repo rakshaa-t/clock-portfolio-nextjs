@@ -1,9 +1,8 @@
 'use client'
 
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import type { MymindCard } from '@/types'
 import { useMatchMedia } from '@/hooks/useMatchMedia'
-import { Drawer, DrawerContent } from '@/components/ui/Drawer'
 
 type MymindPopoverProps = {
   card: MymindCard | null
@@ -15,13 +14,13 @@ type MymindPopoverProps = {
 
 export function MymindPopover({ card, cardEl, gridEl, open, onClose }: MymindPopoverProps) {
   const isMobile = useMatchMedia('(max-width: 480px)')
-  const popRef = useRef<HTMLDivElement>(null)
+  const wrapRef = useRef<HTMLDivElement>(null)
   const innerRef = useRef<HTMLDivElement>(null)
   const [copied, setCopied] = useState(false)
   const [pos, setPos] = useState({ top: 0, left: 0, width: 280, originX: '50%', popDir: '6px' })
 
-  // Position popover on desktop
-  useEffect(() => {
+  // Position popover on desktop (sync before paint)
+  useLayoutEffect(() => {
     if (!open || !cardEl || !gridEl || isMobile) return
     const gridRect = gridEl.getBoundingClientRect()
     const cardRect = cardEl.getBoundingClientRect()
@@ -32,7 +31,7 @@ export function MymindPopover({ card, cardEl, gridEl, open, onClose }: MymindPop
     left = Math.max(gridRect.left, Math.min(left, gridRect.right - popWidth))
 
     // Measure popover height (briefly show invisible)
-    const wrap = popRef.current
+    const wrap = wrapRef.current
     if (wrap) {
       wrap.style.visibility = 'hidden'
       wrap.style.top = '0px'
@@ -70,7 +69,7 @@ export function MymindPopover({ card, cardEl, gridEl, open, onClose }: MymindPop
     return () => document.removeEventListener('keydown', onKey)
   }, [open, onClose])
 
-  // Close on scroll (desktop)
+  // Close on scroll (desktop, once:true — matches Astro mymind behavior)
   useEffect(() => {
     if (!open || isMobile) return
     function onScroll() { onClose() }
@@ -81,6 +80,14 @@ export function MymindPopover({ card, cardEl, gridEl, open, onClose }: MymindPop
   // Reset copied on close
   useEffect(() => {
     if (!open) setCopied(false)
+  }, [open])
+
+  // Focus close button on open
+  useEffect(() => {
+    if (!open) return
+    requestAnimationFrame(() => {
+      wrapRef.current?.querySelector<HTMLButtonElement>('.pop-close')?.focus()
+    })
   }, [open])
 
   const handleCopy = useCallback(() => {
@@ -97,16 +104,16 @@ export function MymindPopover({ card, cardEl, gridEl, open, onClose }: MymindPop
   const popoverContent = (
     <>
       {/* Header */}
-      <div className="flex justify-between items-start mb-3">
-        <div className="font-sans text-[13px] font-semibold text-text-primary leading-[1.35] flex-1">
+      <div className="pop-header">
+        <div className="pop-title" style={{ fontSize: 13 }}>
           {card.title}
         </div>
         <button
+          className="pop-close"
           onClick={(e) => { e.stopPropagation(); onClose() }}
-          className="w-6 h-6 rounded-full flex items-center justify-center cursor-pointer text-[12px] text-black/[0.48] border-none shrink-0 ml-2 transition-[background,color] duration-150"
-          style={{ background: 'rgba(0,0,0,0.06)', transitionTimingFunction: 'cubic-bezier(0.32,0.72,0,1)' }}
+          aria-label="Close"
         >
-          &times;
+          ✕
         </button>
       </div>
 
@@ -116,7 +123,7 @@ export function MymindPopover({ card, cardEl, gridEl, open, onClose }: MymindPop
           href={card.url || '#'}
           target="_blank"
           rel="noopener noreferrer"
-          className="font-mono text-[12px] text-accent no-underline inline-flex items-center gap-1 mb-3 transition-opacity duration-150 hover:opacity-70"
+          className="pop-source"
           onClick={(e) => e.stopPropagation()}
         >
           {card.source} &#x2197;
@@ -125,20 +132,16 @@ export function MymindPopover({ card, cardEl, gridEl, open, onClose }: MymindPop
 
       {/* TLDR */}
       {card.tldr && (
-        <div className="font-sans text-[12px] text-black/[0.62] leading-[1.6] mb-3">
+        <div className="pop-tldr">
           {card.tldr}
         </div>
       )}
 
       {/* Tags */}
       {card.tags && card.tags.length > 0 && (
-        <div className="flex gap-1.5 flex-wrap mb-3">
+        <div className="pop-tags">
           {card.tags.map((tag) => (
-            <span
-              key={tag}
-              className="px-1.5 py-0.5 rounded-[4px] font-mono text-[12px] font-medium tracking-[0.01em] uppercase"
-              style={{ background: 'rgba(0,0,0,0.04)', color: 'rgba(0,0,0,0.45)' }}
-            >
+            <span key={tag} className="pop-tag">
               {tag}
             </span>
           ))}
@@ -146,22 +149,13 @@ export function MymindPopover({ card, cardEl, gridEl, open, onClose }: MymindPop
       )}
 
       {/* Footer */}
-      <div
-        className="flex items-center justify-between mt-3 pt-2.5"
-        style={{ borderTop: '1px solid rgba(0,0,0,0.05)' }}
-      >
-        <span className="font-mono text-[12px] text-black/[0.48] tracking-[0.02em]">
+      <div className="pop-footer">
+        <span className="pop-date">
           {card.date}
         </span>
         <button
           onClick={(e) => { e.stopPropagation(); handleCopy() }}
-          className="flex items-center gap-1 font-sans text-[12px] font-medium cursor-pointer rounded-[8px] px-2 py-1 transition-[color,border-color,background] duration-150"
-          style={{
-            color: copied ? 'var(--color-accent)' : 'rgba(0,0,0,0.4)',
-            background: 'none',
-            border: copied ? '1px solid rgba(139,126,200,0.3)' : '1px solid rgba(0,0,0,0.08)',
-            transitionTimingFunction: 'cubic-bezier(0.32,0.72,0,1)',
-          }}
+          className={`pop-copy${copied ? ' copied' : ''}`}
         >
           {copied ? (
             <>
@@ -179,20 +173,6 @@ export function MymindPopover({ card, cardEl, gridEl, open, onClose }: MymindPop
     </>
   )
 
-  // Mobile: bottom sheet
-  if (isMobile) {
-    return (
-      <Drawer open={open} onOpenChange={(v) => !v && onClose()}>
-        <DrawerContent>
-          <div className="p-4 pb-6">
-            {popoverContent}
-          </div>
-        </DrawerContent>
-      </Drawer>
-    )
-  }
-
-  // Desktop: floating popover
   return (
     <>
       {/* Scrim */}
@@ -201,24 +181,30 @@ export function MymindPopover({ card, cardEl, gridEl, open, onClose }: MymindPop
         onMouseDown={onClose}
       />
 
-      {/* Popover */}
+      {/* Popover wrap */}
       <div
-        ref={popRef}
+        ref={wrapRef}
         className={open ? 'mm-popover-wrap open' : 'mm-popover-wrap'}
-        style={{
-          position: 'fixed',
-          top: pos.top,
-          left: pos.left,
-          width: pos.width,
-        }}
+        role="dialog"
+        aria-label="Bookmark details"
+        style={
+          isMobile
+            ? { position: 'fixed' }
+            : { position: 'fixed', top: pos.top, left: pos.left, width: pos.width }
+        }
       >
+        <div className="sheet-handle" />
         <div
           ref={innerRef}
           className="mm-popover"
-          style={{
-            transformOrigin: `${pos.originX} ${pos.popDir.startsWith('-') ? '100%' : '0'}`,
-            ['--pop-dir' as string]: pos.popDir,
-          }}
+          style={
+            isMobile
+              ? undefined
+              : {
+                  transformOrigin: `${pos.originX} ${pos.popDir.startsWith('-') ? '100%' : '0'}`,
+                  ['--pop-dir' as string]: pos.popDir,
+                }
+          }
           onClick={(e) => e.stopPropagation()}
         >
           {popoverContent}

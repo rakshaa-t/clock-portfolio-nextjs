@@ -8,7 +8,7 @@ import type { Book } from '@/types'
 type BookCoverProps = {
   book: Book
   active?: boolean
-  onClick?: () => void
+  onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void
   className?: string
 }
 

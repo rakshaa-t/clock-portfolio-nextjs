@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useCallback, useMemo, useRef, useState } from 'react'
 import { useAudio } from '@/hooks/useAudio'
 import { KINDLE_BOOKS } from '@/data/books'
 import { cn } from '@/lib/utils'
@@ -37,6 +37,8 @@ export function BooksSection() {
   const [activeFilter, setActiveFilter] = useState<BookCategory>('all')
   const [expanded, setExpanded] = useState(false)
   const [openBookIdx, setOpenBookIdx] = useState<number | null>(null)
+  const [activeCardEl, setActiveCardEl] = useState<HTMLElement | null>(null)
+  const gridRef = useRef<HTMLDivElement>(null)
   const { playBookClick } = useAudio()
 
   // Filter books by active category
@@ -56,21 +58,33 @@ export function BooksSection() {
     setActiveFilter(filter)
     setExpanded(false)
     setOpenBookIdx(null)
+    setActiveCardEl(null)
   }
 
   function handleToggleExpanded() {
     setExpanded((prev) => !prev)
     setOpenBookIdx(null)
+    setActiveCardEl(null)
   }
 
-  function handleBookOpenChange(globalIdx: number, isOpen: boolean) {
-    if (isOpen) {
-      playBookClick()
-      setOpenBookIdx(globalIdx)
-    } else {
+  const handleBookClick = useCallback((globalIdx: number, el: HTMLElement) => {
+    playBookClick()
+    if (openBookIdx === globalIdx) {
       setOpenBookIdx(null)
+      setActiveCardEl(null)
+    } else {
+      setOpenBookIdx(globalIdx)
+      setActiveCardEl(el)
     }
-  }
+  }, [openBookIdx, playBookClick])
+
+  const handlePopoverClose = useCallback(() => {
+    setOpenBookIdx(null)
+    setActiveCardEl(null)
+  }, [])
+
+  // Find the active book by global index
+  const activeBook = openBookIdx !== null ? KINDLE_BOOKS[openBookIdx] : null
 
   return (
     <section
@@ -110,6 +124,7 @@ export function BooksSection() {
 
       {/* Cover grid */}
       <div
+        ref={gridRef}
         className={cn(
           'grid gap-3',
           'grid-cols-4',
@@ -117,8 +132,7 @@ export function BooksSection() {
         )}
         style={{ maxWidth: 520, margin: '0 auto' }}
       >
-        {visibleBooks.map((book, i) => {
-          // Find the global index so we can track open state correctly
+        {visibleBooks.map((book) => {
           const globalIdx = KINDLE_BOOKS.indexOf(book)
           const isOpen = openBookIdx === globalIdx
 
@@ -132,16 +146,11 @@ export function BooksSection() {
               viewport={{ once: true, margin: '0px 0px -40px 0px' }}
               transition={{ duration: 0.45, ease: EASE_SMOOTH }}
             >
-            <BookPopover
-              book={book}
-              open={isOpen}
-              onOpenChange={(isOpen) => handleBookOpenChange(globalIdx, isOpen)}
-            >
               <BookCover
                 book={book}
                 active={isOpen}
+                onClick={(e) => handleBookClick(globalIdx, e.currentTarget)}
               />
-            </BookPopover>
             </motion.div>
           )
         })}
@@ -158,6 +167,15 @@ export function BooksSection() {
           </ShowMoreButton>
         </div>
       )}
+
+      {/* Book popover (rendered outside grid, like Astro) */}
+      <BookPopover
+        book={activeBook}
+        cardEl={activeCardEl}
+        gridEl={gridRef.current}
+        open={openBookIdx !== null}
+        onClose={handlePopoverClose}
+      />
     </section>
   )
 }
